@@ -21,24 +21,22 @@ def buildApp() {
 
 def buildImage() {
     echo "building the docker image..."
-    env.IMAGE_NAME = "ismailsdockers/java-maven-app"
     sh "docker build -t $IMAGE_NAME:$IMAGE_VERSION ."
     sh "docker tag $IMAGE_NAME:$IMAGE_VERSION $IMAGE_NAME:latest"
 }
 
 def pushImage() {
-    echo "pushing the docker image to docker private repository..."
+    echo "pushing the docker image to ECR private repository..."
 
     withCredentials([usernamePassword(
-        credentialsId: 'docker-credentials',
+        credentialsId: 'aws-ecr-credentials',
         usernameVariable: 'USER',
         passwordVariable: 'PASSWORD'
     )]) {
-        sh "echo $PASSWORD | docker login -u $USER --password-stdin"
+        sh "echo $PASSWORD | docker login -u $USER --password-stdin $DOCKER_REPOSITORY"
+        sh "docker push $IMAGE_NAME:$IMAGE_VERSION"
+        sh "docker push $IMAGE_NAME:latest"
     }
-
-    sh "docker push $IMAGE_NAME:$IMAGE_VERSION"
-    sh "docker push $IMAGE_NAME:latest"
 }
 
 def deploy() {

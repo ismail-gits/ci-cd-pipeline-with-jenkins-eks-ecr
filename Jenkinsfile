@@ -9,6 +9,11 @@ pipeline {
         maven 'maven-3.6'
     }
 
+    environment {
+        DOCKER_REPOSITORY = "649428214798.dkr.ecr.us-east-2.amazonaws.com"
+        IMAGE_NAME = "$DOCKER_REPOSITORY/java-maven-app"
+    }
+
     stages {
         stage('init') {
             steps {
